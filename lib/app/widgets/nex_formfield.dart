@@ -1,5 +1,6 @@
 import 'package:entrance_flutter/app/core/helpers/password_level.dart';
 import 'package:entrance_flutter/app/core/mixin/password_mixin.dart';
+import 'package:entrance_flutter/app/core/utils/password_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -15,6 +16,7 @@ class EmailFormFieldState extends State<EmailFormField> {
   late ValueNotifier<bool> isEmailFocused;
   late TextEditingController emailController;
   late GlobalKey<FormState> _emailFormKey;
+  late ValueNotifier<bool> isValidEmail;
 
   @override
   void initState() {
@@ -24,6 +26,7 @@ class EmailFormFieldState extends State<EmailFormField> {
 
     emailController = TextEditingController();
     isEmailFocused = ValueNotifier(false);
+    isValidEmail = ValueNotifier(false);
     super.initState();
   }
 
@@ -32,6 +35,7 @@ class EmailFormFieldState extends State<EmailFormField> {
     _emailFocus.dispose();
     _emailFocus.removeListener(_onFocusChange);
     emailController.dispose();
+    isValidEmail.dispose();
     super.dispose();
   }
 
@@ -39,8 +43,18 @@ class EmailFormFieldState extends State<EmailFormField> {
     isEmailFocused.value = _emailFocus.hasFocus;
   }
 
-  bool onValidate() {
+  bool isValidate() {
     return _emailFormKey.currentState?.validate() ?? false;
+  }
+
+  void onValidatingEmail(String? email) {
+    if (email == null || email.isEmpty) {
+      isValidEmail.value = false;
+    } else if (!PasswordUtils.containsEmailAddress(email)) {
+      isValidEmail.value = false;
+    } else {
+      isValidEmail.value = true;
+    }
   }
 
   @override
@@ -63,12 +77,11 @@ class EmailFormFieldState extends State<EmailFormField> {
               ),
               border: InputBorder.none,
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
+            onChanged: onValidatingEmail,
+            validator: (email) {
+              if (email == null || email.isEmpty) {
                 return 'The email is required';
-              } else if (!RegExp(
-                      r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
-                  .hasMatch(value)) {
+              } else if (!PasswordUtils.containsEmailAddress(email)) {
                 return 'The email is not valid';
               }
               return null;
@@ -104,6 +117,7 @@ class PasswordFormFieldState extends State<PasswordFormField>
 
   late FocusNode _passwordFocus;
   late ValueNotifier<bool> _isPasswordFocused;
+  late ValueNotifier<bool> isValidPassword;
 
   String _passwordLevel = 'Weak';
   int _passwordStrength = 0;
@@ -114,6 +128,7 @@ class PasswordFormFieldState extends State<PasswordFormField>
     _passwordFocus = FocusNode();
     passwordController = TextEditingController();
     _isPasswordFocused = ValueNotifier(false);
+    isValidPassword = ValueNotifier(false);
     _passwordFocus.addListener(_onFocusChange);
     super.initState();
   }
@@ -123,6 +138,7 @@ class PasswordFormFieldState extends State<PasswordFormField>
     passwordController.dispose();
     _passwordFocus.removeListener(_onFocusChange);
     _passwordFocus.dispose();
+    isValidPassword.dispose();
     super.dispose();
   }
 
@@ -130,8 +146,18 @@ class PasswordFormFieldState extends State<PasswordFormField>
     _isPasswordFocused.value = _passwordFocus.hasFocus;
   }
 
-  bool onValidate() {
+  bool isValidate() {
     return _passwordFormKey.currentState?.validate() ?? false;
+  }
+
+  void onValidatingPassword(String? password) {
+    if (password == null || password.isEmpty) {
+      isValidPassword.value = false;
+    } else if (password.length < 6 || password.length > 18) {
+      isValidPassword.value = false;
+    } else {
+      isValidPassword.value = true;
+    }
   }
 
   @override
@@ -171,6 +197,7 @@ class PasswordFormFieldState extends State<PasswordFormField>
                 _passwordLevel = determinePasswordStrength(password).level;
                 _passwordStrength =
                     determinePasswordStrength(password).strength;
+                onValidatingPassword(password);
               });
             },
             validator: (password) {

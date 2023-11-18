@@ -1,7 +1,3 @@
-import 'dart:convert';
-
-import 'package:entrance_flutter/app/models/category.dart';
-import 'package:entrance_flutter/app/modules/category/controllers/category_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';

@@ -33,4 +33,9 @@ class PasswordUtils {
   static bool _containsSpecialCharacter(String input) {
     return RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(input);
   }
+
+  static bool containsEmailAddress(String input) {
+    return RegExp(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+        .hasMatch(input);
+  }
 }

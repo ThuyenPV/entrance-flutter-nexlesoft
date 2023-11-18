@@ -12,14 +12,17 @@ class SignInController extends GetxController {
   late GlobalKey<EmailFormFieldState> emailFormKey;
   late AuthService authService;
   late CategoryService categoryService;
+  late RxBool isValidFormField;
 
   @override
   void onInit() {
     emailFormKey = GlobalKey();
     passwordFormKey = GlobalKey();
+    isValidFormField = RxBool(false);
     authService = Get.find<AuthService>();
     categoryService = Get.find<CategoryService>();
-    // onGuardRedirect();
+    onValidatingFormField();
+    onGuardRedirect();
     super.onInit();
   }
 
@@ -32,11 +35,39 @@ class SignInController extends GetxController {
     }
   }
 
+  void onValidatingFormField() {
+    var isValidPassword = false;
+    var isValidEmail = false;
+    var passwordState = passwordFormKey.currentState;
+    var emailState = emailFormKey.currentState;
+    passwordState?.passwordController.addListener(() {
+      if (passwordState.passwordController.text.isEmpty) {
+        isValidFormField.value = false;
+      } else {
+        isValidPassword = passwordState.isValidPassword.value;
+        isValidEmail = emailState?.isValidEmail.value ?? false;
+        isValidFormField.value = isValidPassword && isValidEmail;
+      }
+      update();
+    });
+
+    emailState?.emailController.addListener(() {
+      if (emailState.emailController.text.isEmpty) {
+        isValidFormField.value = false;
+      } else {
+        isValidPassword = passwordState?.isValidPassword.value ?? false;
+        isValidEmail = emailState.isValidEmail.value;
+        isValidFormField.value = isValidPassword && isValidEmail;
+      }
+      update();
+    });
+  }
+
   void onSignin() async {
     final passwordState = passwordFormKey.currentState;
     final emailState = emailFormKey.currentState;
-    final isValidPassword = passwordState?.onValidate() ?? false;
-    final isValidEmail = emailState?.onValidate() ?? false;
+    final isValidPassword = passwordState?.isValidate() ?? false;
+    final isValidEmail = emailState?.isValidate() ?? false;
     final password = passwordState?.passwordController.text;
     final email = emailState?.emailController.text;
     if (isValidPassword && isValidEmail) {

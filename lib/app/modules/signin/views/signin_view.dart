@@ -57,14 +57,17 @@ class SignInView extends GetView<SignInController> {
                   const CheckboxField(),
                   const PrivaryAndTerm(),
 
-                  ///
-                  SignupButton(
-                    onTapSignup: () {
-                      Get.to(Routes.SIGNUP);
-                    },
-                    onTapContinue: () {
-                      controller.onSignin();
-                    },
+                  /// Actions
+                  Obx(
+                    () => SignupButton(
+                      isActive: controller.isValidFormField.value,
+                      onTapSignup: () {
+                        Get.to(Routes.SIGNUP);
+                      },
+                      onTapContinue: () {
+                        controller.onSignin();
+                      },
+                    ),
                   ),
                 ],
               ),

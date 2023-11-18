@@ -6,10 +6,12 @@ class SignupButton extends StatelessWidget {
     super.key,
     required this.onTapSignup,
     required this.onTapContinue,
+    required this.isActive,
   });
 
   final VoidCallback onTapSignup;
   final VoidCallback onTapContinue;
+  final bool isActive;
 
   @override
   Widget build(BuildContext context) {
@@ -27,19 +29,19 @@ class SignupButton extends StatelessWidget {
           ),
         ),
         InkWell(
-          onTap: onTapContinue,
+          onTap: isActive ? onTapContinue : null,
           child: Container(
             height: 48.h,
             width: 48.h,
             decoration: BoxDecoration(
               border: Border.all(
-                color: Color(0xff6C66FF),
+                color: isActive ? Color(0xff6C66FF) : Colors.white54,
               ),
               borderRadius: BorderRadius.circular(48.h),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.arrow_forward,
-              color: Colors.white,
+              color: isActive ? Colors.white : Colors.white54,
             ),
           ),
         ),
