@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:entrance_flutter/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,8 +29,21 @@ class CategoryView extends GetView<CategoryController> {
                 SizedBox(
                   height: 1.sh * 2 / 5,
                   width: 1.sw,
-                  child: Assets.images.cover.image(
-                    fit: BoxFit.cover,
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return const LinearGradient(
+                        colors: [
+                          Colors.black26,
+                          Colors.black12,
+                        ],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.difference,
+                    child: Assets.images.cover.image(
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 Container(
