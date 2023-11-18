@@ -77,14 +77,9 @@ class SignInController extends GetxController {
           password: password ?? '',
         );
         if (isLoggedIn) {
-          final isSelected = await categoryService.isSelectedCategory ?? false;
-          if (isSelected) {
-            Get.toNamed(Routes.HOME);
-          } else {
-            categoryService.onFetchCategories().then((value) {
-              Get.toNamed(Routes.CATEGORY);
-            });
-          }
+          categoryService.onFetchCategories().then((value) {
+            Get.toNamed(Routes.CATEGORY);
+          });
           Get.snackbar(
             'Login successful!',
             'Congratulations, you have successfully logged in',

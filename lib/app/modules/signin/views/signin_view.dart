@@ -58,16 +58,22 @@ class SignInView extends GetView<SignInController> {
                   const PrivaryAndTerm(),
 
                   /// Actions
-                  Obx(
-                    () => SignupButton(
-                      isActive: controller.isValidFormField.value,
-                      onTapSignup: () {
-                        Get.to(Routes.SIGNUP);
-                      },
-                      onTapContinue: () {
-                        controller.onSignin();
-                      },
-                    ),
+
+                  GetBuilder(
+                    initState: (state) {
+                      Get.find<SignInController>().onValidatingFormField();
+                    },
+                    builder: (SignInController controller) {
+                      return SignupButton(
+                        isActive: controller.isValidFormField.value,
+                        onTapSignup: () {
+                          Get.to(Routes.SIGNUP);
+                        },
+                        onTapContinue: () {
+                          controller.onSignin();
+                        },
+                      );
+                    },
                   ),
                 ],
               ),
