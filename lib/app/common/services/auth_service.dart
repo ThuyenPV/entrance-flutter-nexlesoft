@@ -4,7 +4,6 @@ import 'package:entrance_flutter/app/common/storage/local_storage.dart';
 import 'package:entrance_flutter/app/models/user.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService extends GetxController {
   RxBool isLoggedIn = false.obs;
@@ -31,6 +30,11 @@ class AuthService extends GetxController {
           value: response.body,
         );
 
+        LocalStorage.onSaveItem(
+          key: SharedKey.isLoggedIn,
+          value: true,
+        );
+
         ///
         isLoggedIn.value = true;
         userLoggedIn.value = user;
@@ -41,5 +45,10 @@ class AuthService extends GetxController {
     } catch (error) {
       throw Exception('$error');
     }
+  }
+
+  Future<bool?> get getIsLoggedIn async {
+    final isLoggedIn = await LocalStorage.onGetBool(key: SharedKey.isLoggedIn);
+    return isLoggedIn;
   }
 }

@@ -4,12 +4,10 @@ import 'package:entrance_flutter/app/models/category.dart';
 import 'package:entrance_flutter/app/models/user.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../storage/local_storage.dart';
 
 class CategoryService extends GetxController {
-  RxBool isCategorySelected = false.obs;
   RxList<Category> categories = RxList([]);
 
   Future<void> onFetchCategories() async {
@@ -47,8 +45,19 @@ class CategoryService extends GetxController {
     return null;
   }
 
-  void onCompleteCategory() {
-    LocalStorage.onSaveItem(key: SharedKey.isSelectedCategory, value: true);
-    isCategorySelected.value = true;
+  Future<void> onCompleteCategory({required List<Category> categories}) async {
+    try {
+      LocalStorage.onSaveItem(key: SharedKey.isSelectedCategory, value: true);
+      LocalStorage.onSaveItem(
+        key: SharedKey.categorySelected,
+        value: categories.map((e) => e.toJson().toString()).toList(),
+      );
+    } catch (e) {
+      throw (e);
+    }
+  }
+
+  Future<bool?> get isSelectedCategory async {
+    return await LocalStorage.onGetBool(key: SharedKey.isSelectedCategory);
   }
 }

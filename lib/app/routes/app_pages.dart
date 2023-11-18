@@ -15,13 +15,21 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.SIGNUP;
+  static const INITIAL = Routes.SIGNIN;
 
   static final routes = [
     GetPage(
-      name: _Paths.SIGNUP,
+      name: _Paths.SIGNIN,
       page: () => const SignInView(),
       binding: SignInBinding(),
+    ),
+    GetPage(
+      name: _Paths.HOME,
+      page: () => const HomeView(),
+      binding: HomeBinding(),
+      bindings: [
+        CategoryBinding(),
+      ],
     ),
     GetPage(
       name: _Paths.SIGNUP,
@@ -32,14 +40,6 @@ class AppPages {
       name: _Paths.CATEGORY,
       page: () => CategoryView(),
       binding: CategoryBinding(),
-    ),
-    GetPage(
-      name: _Paths.HOME,
-      page: () => const HomeView(),
-      binding: HomeBinding(),
-      // middlewares: [
-      //   AuthGuard(),
-      // ],
     ),
   ];
 }

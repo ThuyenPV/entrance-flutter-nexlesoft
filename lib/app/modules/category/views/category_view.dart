@@ -11,7 +11,8 @@ import '../controllers/category_controller.dart';
 class CategoryView extends GetView<CategoryController> {
   CategoryView({Key? key}) : super(key: key);
 
-  final CategoryService networkController = Get.find<CategoryService>();
+  final categoryService = Get.find<CategoryService>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +71,23 @@ class CategoryView extends GetView<CategoryController> {
                         ),
                       ),
                       InkWell(
-                        onTap: () => Get.toNamed(Routes.HOME),
+                        onTap: () {
+                          if (controller.categorySelected.isEmpty) {
+                            Get.snackbar(
+                              'Hint!',
+                              'At least one category must be selected',
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                          } else {
+                            categoryService
+                                .onCompleteCategory(
+                                    categories: controller.categorySelected)
+                                .then((_) {
+                              Get.toNamed(Routes.HOME);
+                            });
+                          }
+                        },
                         child: const Text(
                           'Done',
                           style: TextStyle(
@@ -97,9 +114,9 @@ class CategoryView extends GetView<CategoryController> {
                 mainAxisSpacing: 8.0,
                 childAspectRatio: 3 / 2,
               ),
-              itemCount: networkController.categories.length,
+              itemCount: categoryService.categories.length,
               itemBuilder: (BuildContext context, int index) {
-                final category = networkController.categories[index];
+                final category = categoryService.categories[index];
                 return Obx(
                   () => GestureDetector(
                     onTap: () {
@@ -126,8 +143,8 @@ class CategoryView extends GetView<CategoryController> {
                             : null,
                       ),
                       child: Text(
-                        networkController.categories[index].name,
-                        style: TextStyle(color: Colors.white),
+                        categoryService.categories[index].name,
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                   ),

@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../../common/services/category_service.dart';
 
 class CategoryController extends GetxController {
-  final CategoryService networkController = Get.find<CategoryService>();
+  final CategoryService categoryService = Get.find<CategoryService>();
   late RxList<Category> categorySelected;
   @override
   void onInit() {

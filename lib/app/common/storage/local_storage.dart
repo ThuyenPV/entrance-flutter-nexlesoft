@@ -1,5 +1,4 @@
-import 'dart:ffi';
-
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
@@ -8,7 +7,6 @@ class LocalStorage {
     required dynamic value,
   }) async {
     try {
-      print('value >> ${value is String}');
       var prefs = await SharedPreferences.getInstance();
       if (value is String) {
         await prefs.setString(key, value);
@@ -34,6 +32,28 @@ class LocalStorage {
     try {
       var prefs = await SharedPreferences.getInstance();
       return prefs.getString(key);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static Future<bool?> onGetBool({
+    required String key,
+  }) async {
+    try {
+      var prefs = await SharedPreferences.getInstance();
+      return prefs.getBool(key);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static Future<List<String>?> onGetList({
+    required String key,
+  }) async {
+    try {
+      var prefs = await SharedPreferences.getInstance();
+      return prefs.getStringList(key);
     } catch (e) {
       return null;
     }
@@ -68,4 +88,5 @@ class SharedKey {
   static const String accessToken = 'accessToken';
   static const String isLoggedIn = 'isLoggedIn';
   static const String isSelectedCategory = 'isSelectedCategory';
+  static const String categorySelected = 'categorySelected';
 }

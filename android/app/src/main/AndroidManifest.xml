@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nexlesoft.entrance_flutter">
+    <uses-permission android:name="android.permission.INTERNET"/>
+
    <application
         android:label="entrance_flutter"
         android:name="${applicationName}"

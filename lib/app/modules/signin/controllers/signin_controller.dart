@@ -1,5 +1,6 @@
 import 'package:entrance_flutter/app/common/services/auth_service.dart';
 import 'package:entrance_flutter/app/common/services/category_service.dart';
+import 'package:entrance_flutter/app/common/storage/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,16 +10,26 @@ import '../../../widgets/nex_formfield.dart';
 class SignInController extends GetxController {
   late GlobalKey<PasswordFormFieldState> passwordFormKey;
   late GlobalKey<EmailFormFieldState> emailFormKey;
-  late AuthService authController;
-  late CategoryService networkController;
+  late AuthService authService;
+  late CategoryService categoryService;
 
   @override
   void onInit() {
     emailFormKey = GlobalKey();
     passwordFormKey = GlobalKey();
-    authController = Get.find<AuthService>();
-    networkController = Get.find<CategoryService>();
+    authService = Get.find<AuthService>();
+    categoryService = Get.find<CategoryService>();
+    // onGuardRedirect();
     super.onInit();
+  }
+
+  void onGuardRedirect() async {
+    final isLoggedIn = await LocalStorage.onGetBool(key: SharedKey.isLoggedIn);
+    if (isLoggedIn ?? false) {
+      Get.toNamed(Routes.HOME);
+    } else {
+      Get.toNamed(Routes.SIGNIN);
+    }
   }
 
   void onSignin() async {
@@ -30,20 +41,25 @@ class SignInController extends GetxController {
     final email = emailState?.emailController.text;
     if (isValidPassword && isValidEmail) {
       try {
-        final isLoggedIn = await authController.signIn(
+        final isLoggedIn = await authService.signIn(
           email: email ?? '',
           password: password ?? '',
         );
         if (isLoggedIn) {
-          networkController.onFetchCategories().then((value) {
-            Get.snackbar(
-              'Login successful!',
-              'Congratulations, you have successfully logged in',
-              backgroundColor: Colors.green,
-              colorText: Colors.white,
-            );
-            Get.toNamed(Routes.CATEGORY);
-          });
+          final isSelected = await categoryService.isSelectedCategory ?? false;
+          if (isSelected) {
+            Get.toNamed(Routes.HOME);
+          } else {
+            categoryService.onFetchCategories().then((value) {
+              Get.toNamed(Routes.CATEGORY);
+            });
+          }
+          Get.snackbar(
+            'Login successful!',
+            'Congratulations, you have successfully logged in',
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
         } else {
           Get.snackbar(
             'Something went wrong!',
@@ -61,15 +77,5 @@ class SignInController extends GetxController {
         );
       }
     }
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }

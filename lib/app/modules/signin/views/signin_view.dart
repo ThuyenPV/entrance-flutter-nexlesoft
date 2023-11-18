@@ -54,7 +54,7 @@ class SignInView extends GetView<SignInController> {
                   PasswordFormField(
                     key: controller.passwordFormKey,
                   ),
-                  CheckboxField(),
+                  const CheckboxField(),
                   const PrivaryAndTerm(),
 
                   ///
