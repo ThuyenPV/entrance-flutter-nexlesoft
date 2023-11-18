@@ -6,13 +6,13 @@ class PrivaryAndTerm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RichText(
-      text: TextSpan(
+      text: const TextSpan(
         text:
             'By clicking Sign Up, you are indicating that you have read and agree to the ',
         style: TextStyle(
           color: Colors.white70,
         ),
-        children: const [
+        children: [
           TextSpan(
             text: 'Terms of Service',
             style: TextStyle(

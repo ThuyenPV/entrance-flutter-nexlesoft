@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../../common/services/category_service.dart';
 import '../controllers/category_controller.dart';
 
 class CategoryBinding extends Bindings {
@@ -8,5 +9,6 @@ class CategoryBinding extends Bindings {
     Get.lazyPut<CategoryController>(
       () => CategoryController(),
     );
+    Get.lazyPut<CategoryService>(() => CategoryService());
   }
 }

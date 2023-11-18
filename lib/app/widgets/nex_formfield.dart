@@ -7,28 +7,31 @@ class EmailFormField extends StatefulWidget {
   const EmailFormField({super.key});
 
   @override
-  _EmailFormFieldState createState() => _EmailFormFieldState();
+  EmailFormFieldState createState() => EmailFormFieldState();
 }
 
-class _EmailFormFieldState extends State<EmailFormField> {
-  late TextEditingController _emailController;
+class EmailFormFieldState extends State<EmailFormField> {
   late FocusNode _emailFocus;
   late ValueNotifier<bool> isEmailFocused;
+  late TextEditingController emailController;
+  late GlobalKey<FormState> _emailFormKey;
 
   @override
   void initState() {
-    _emailController = TextEditingController();
     _emailFocus = FocusNode();
-    isEmailFocused = ValueNotifier(false);
     _emailFocus.addListener(_onFocusChange);
+    _emailFormKey = GlobalKey<FormState>();
+
+    emailController = TextEditingController();
+    isEmailFocused = ValueNotifier(false);
     super.initState();
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _emailFocus.removeListener(_onFocusChange);
     _emailFocus.dispose();
+    _emailFocus.removeListener(_onFocusChange);
+    emailController.dispose();
     super.dispose();
   }
 
@@ -36,23 +39,40 @@ class _EmailFormFieldState extends State<EmailFormField> {
     isEmailFocused.value = _emailFocus.hasFocus;
   }
 
+  bool onValidate() {
+    return _emailFormKey.currentState?.validate() ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        TextFormField(
-          focusNode: _emailFocus,
-          controller: _emailController,
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-          decoration: const InputDecoration(
-            labelText: 'Your email',
-            labelStyle: TextStyle(
+        Form(
+          key: _emailFormKey,
+          child: TextFormField(
+            controller: emailController,
+            focusNode: _emailFocus,
+            style: const TextStyle(
               color: Colors.white,
             ),
-            border: InputBorder.none,
+            decoration: const InputDecoration(
+              labelText: 'Your email',
+              labelStyle: TextStyle(
+                color: Colors.white,
+              ),
+              border: InputBorder.none,
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'The email is required';
+              } else if (!RegExp(
+                      r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+                  .hasMatch(value)) {
+                return 'The email is not valid';
+              }
+              return null;
+            },
           ),
         ),
         ValueListenableBuilder(
@@ -79,8 +99,8 @@ class PasswordFormField extends StatefulWidget {
 
 class PasswordFormFieldState extends State<PasswordFormField>
     with PasswordMixin {
+  late TextEditingController passwordController;
   final GlobalKey<FormState> _passwordFormKey = GlobalKey<FormState>();
-  late TextEditingController _passwordController;
 
   late FocusNode _passwordFocus;
   late ValueNotifier<bool> _isPasswordFocused;
@@ -92,7 +112,7 @@ class PasswordFormFieldState extends State<PasswordFormField>
   @override
   void initState() {
     _passwordFocus = FocusNode();
-    _passwordController = TextEditingController();
+    passwordController = TextEditingController();
     _isPasswordFocused = ValueNotifier(false);
     _passwordFocus.addListener(_onFocusChange);
     super.initState();
@@ -100,7 +120,7 @@ class PasswordFormFieldState extends State<PasswordFormField>
 
   @override
   void dispose() {
-    _passwordController.dispose();
+    passwordController.dispose();
     _passwordFocus.removeListener(_onFocusChange);
     _passwordFocus.dispose();
     super.dispose();
@@ -122,7 +142,7 @@ class PasswordFormFieldState extends State<PasswordFormField>
         Form(
           key: _passwordFormKey,
           child: TextFormField(
-            controller: _passwordController,
+            controller: passwordController,
             obscureText: _obscurePassword,
             focusNode: _passwordFocus,
             style: const TextStyle(
@@ -133,6 +153,7 @@ class PasswordFormFieldState extends State<PasswordFormField>
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.white70,
                 ),
                 onPressed: () {
                   setState(() {
@@ -148,22 +169,44 @@ class PasswordFormFieldState extends State<PasswordFormField>
             onChanged: (password) {
               setState(() {
                 _passwordLevel = determinePasswordStrength(password).level;
-                _passwordStrength = determinePasswordStrength(password).stregth;
+                _passwordStrength =
+                    determinePasswordStrength(password).strength;
               });
+            },
+            validator: (password) {
+              if (password == null || password.isEmpty) {
+                return 'The password is required';
+              } else if (password.length < 6 || password.length > 18) {
+                return 'Too short';
+              }
+              return null;
             },
           ),
         ),
-        ValueListenableBuilder(
-          valueListenable: _isPasswordFocused,
-          builder: (_, isFocused, __) {
-            return Container(
+        Stack(
+          fit: StackFit.loose,
+          children: [
+            Container(
               height: 1.5,
               width: 1.sh,
-              color: isFocused
-                  ? _passwordStrength.getPasswordLevel.color
-                  : Colors.grey,
-            );
-          },
+              color: Colors.grey,
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ValueListenableBuilder(
+                valueListenable: _isPasswordFocused,
+                builder: (_, isFocused, __) {
+                  return Container(
+                    height: 1.5,
+                    width: _passwordStrength * 1.sw / 4,
+                    color: isFocused
+                        ? _passwordStrength.getPasswordLevel.color
+                        : Colors.grey,
+                  );
+                },
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         Align(

@@ -10,36 +10,30 @@ mixin PasswordMixin on State<PasswordFormField> {
     if (input.isEmpty) {
       return PasswordResponse(
         level: '',
-        stregth: 0,
+        strength: 0,
       );
-    } else if (input.length < 6) {
+    } else if (input.length < 6 || input.length > 18) {
       return PasswordResponse(
         level: 'Too short',
-        stregth: 1,
-      );
-    } else if (input.length > 18) {
-      return PasswordResponse(
-        level: 'Too long',
-        stregth: 1,
+        strength: 0,
       );
     }
-
     strength = PasswordUtils.calculatePasswordStrength(input);
     final level = strength.getPasswordLevel.level.name;
 
     return PasswordResponse(
       level: level,
-      stregth: strength,
+      strength: strength,
     );
   }
 }
 
 class PasswordResponse {
   final String level;
-  final int stregth;
+  final int strength;
 
   PasswordResponse({
     required this.level,
-    required this.stregth,
+    required this.strength,
   });
 }

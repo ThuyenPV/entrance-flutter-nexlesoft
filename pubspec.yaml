@@ -16,8 +16,8 @@ dependencies:
   build_runner: ^2.3.3
   http: ^1.1.0
   gap: ^3.0.1
+  shared_preferences: ^2.2.2
   
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
